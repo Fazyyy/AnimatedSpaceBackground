@@ -1,5 +1,9 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
+body {
+  margin-top: 75px;
+}
+
 canvas {
   position:fixed;
   top:0;
@@ -9,6 +13,17 @@ canvas {
 main {
   position: absolute;
   color: #fff;
-  background: rgba(0,0,0,0.4);
   width:100%;
+}
+
+section {
+  background: rgba(0,0,0,0.4);
+  padding: 15px;
+}
+
+.jumbotron {
+  margin-top: 15px;
+  margin-bottom: 75px;
+  background: rgba(0,0,0,0.4);
+  padding: 15px;
 }
