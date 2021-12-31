@@ -3,10 +3,9 @@ import 'bootstrap';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
+let skyboxImage = 'skyboxSpace';
 const scene = new THREE.Scene;
-
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector('#bg'), antialias: true
 });
@@ -14,9 +13,7 @@ const renderer = new THREE.WebGLRenderer({
 //Set scene size, controls and camera
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
-camera.position.setZ(30);
-camera.position.setX(-5);
-camera.position.setY(20);
+camera.position.set(30, -5, 20);
 const controls = new OrbitControls(camera, renderer.domElement);
 
 renderer.render( scene, camera );
@@ -28,9 +25,33 @@ const ambientLight = new THREE.AmbientLight(0xffffff)
 pointLight.position.set(20,20,20)
 scene.add(pointLight, ambientLight);
 
-//const lightHelper = new THREE.PointLightHelper(pointLight)
-//const gridHelper = new THREE.GridHelper(200, 50);
-//scene.add(lightHelper, gridHelper)
+//Add a skybox
+function createPathStrings() {
+  const basePath = "./";
+  const fileType = ".png";
+  const sides = ["ft", "bk", "up", "dn", "rt", "lf"];
+
+  const pathStings = sides.map(side => {
+    return basePath + side + fileType;
+  });
+
+  return pathStings;
+}
+
+function createMaterialArray() {
+  const skyboxImagepaths = createPathStrings();
+  const materialArray = skyboxImagepaths.map(image => {
+    let texture = new THREE.TextureLoader().load(image);
+    return new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide });
+  });
+  return materialArray;
+}
+
+const materialArray = createMaterialArray();
+const skyboxGeo = new THREE.BoxGeometry(100, 100, 100);
+const skybox = new THREE.Mesh(skyboxGeo, materialArray);
+skybox.position.set(0,0,0)
+scene.add(skybox);
 
 //Set an array of stars at random op==points in 3D space
 function addStar() {
@@ -40,17 +61,12 @@ function addStar() {
 
   const [x, y, z] = Array(3)
     .fill()
-    .map(() => THREE.MathUtils.randFloatSpread(100));
+    .map(() => THREE.MathUtils.randFloatSpread(500));
 
   star.position.set(x, y, z);
   scene.add(star);
 }
-
 Array(200).fill().forEach(addStar);
-
-//Space Background
-const spaceTexture = new THREE.TextureLoader().load('/space.jpg');
-scene.background = spaceTexture;
 
 //Add Moon
 const moonTexture = new THREE.TextureLoader().load('/moon.jpg');
@@ -64,8 +80,7 @@ const moon = new THREE.Mesh(
   })
 );
 
-moon.position.z = -40;
-moon.position.x = -10;
+moon.position.set(-10,15,15);
 
 scene.add(moon)
 
@@ -88,6 +103,9 @@ function animate() {
   requestAnimationFrame( animate );
   controls.update();
   renderer.render( scene, camera );
+  skybox.rotation.x += 0.005;
+  skybox.rotation.y += 0.005;
+  moon.rotation.y += 0.01;
 }
 
 animate()
